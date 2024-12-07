@@ -8,7 +8,7 @@ RUN apk add --no-cache \
     openrc \
     curl \
     git \
-    sudo
+    sudo 
 
 # Add a non-root user (optional, for better security)
 RUN adduser -D -s /bin/bash appuser && \
@@ -45,4 +45,4 @@ RUN go build -o server server.go
 EXPOSE 8080
 
 # Start the server and Docker daemon
-CMD ["sh", "-c", "sudo dockerd & ./server"]
+CMD ["./server"]

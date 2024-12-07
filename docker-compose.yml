@@ -1,0 +1,13 @@
+version: '3.9'
+
+services:
+  app:
+    build:
+      context: .
+    container_name: docker-mon
+    ports:
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - DOCKER_HOST=unix:///var/run/docker.sock  # Ensure Docker host is set correctly
