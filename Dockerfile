@@ -1,7 +1,7 @@
-# Use a compatible Go version for osv-scanner
+# Use a compatible Go version
 FROM golang:1.22-alpine
 
-# Install dependencies, including sudo
+# Install dependencies
 RUN apk add --no-cache \
     bash \
     docker \
@@ -23,26 +23,27 @@ RUN go install -ldflags "-X main.BuildDate=$(date +'%Y-%m-%dT%H:%M:%S%z')" githu
 
 # Install osv-scanner
 RUN go install github.com/google/osv-scanner/cmd/osv-scanner@latest
-
-# Set up working directory and Docker monitor path
 RUN mkdir -p /root/.git-monitor
-
+# Set up working directory
 WORKDIR /app
 
-# Copy the Go server code, repos.txt, and CLI binary
-COPY server.go . 
-COPY repos.txt . 
-COPY docker-vuln ./docker-vuln
-COPY git-monitor.yaml /home/appuser/.git-monitor.yaml
+# Copy only the necessary files and directories
+COPY server.go ./server.go
+COPY internal ./internal
+COPY config/git-monitor.yaml /home/appuser/.git-monitor.yaml
+COPY data ./data
+COPY bin/docker-vuln ./bin/docker-vuln
 
-# Make the CLI tool executable
-RUN chmod +x ./docker-vuln
+RUN go mod init monitor
+RUN go mod tidy
+# Make the binary in 'bin' executable
+RUN chmod +x ./bin/docker-vuln
 
 # Build the Go server
-RUN go build -o server server.go
+RUN go build -o server ./server.go
 
 # Expose the port the server listens on
 EXPOSE 8080
 
-# Start the server and Docker daemon
+# Start the server
 CMD ["./server"]
