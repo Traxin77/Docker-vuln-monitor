@@ -33,8 +33,11 @@ COPY internal ./internal
 COPY config/git-monitor.yaml /home/appuser/.git-monitor.yaml
 COPY data ./data
 COPY bin/docker-vuln ./bin/docker-vuln
+COPY .env .
 
 RUN go mod init monitor
+RUN go get go.mongodb.org/mongo-driver@latest
+RUN go get github.com/joho/godotenv
 RUN go mod tidy
 # Make the binary in 'bin' executable
 RUN chmod +x ./bin/docker-vuln
